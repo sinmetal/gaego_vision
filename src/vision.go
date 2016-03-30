@@ -58,7 +58,7 @@ func handleVision(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%s call vision api error", imgurl), http.StatusBadRequest)
 		return
 	}
-	body, err := json.Marshal(vresp.Responses[0].LabelAnnotations)
+	body, err := json.Marshal(vresp.Responses[0])
 	if err != nil {
 		log.Warningf(ctx, "vision api response json marshal error. err = %s", err.Error())
 		http.Error(w, fmt.Sprintf("%s vision api response json marshal error", imgurl), http.StatusBadRequest)
@@ -72,13 +72,41 @@ func handleVision(w http.ResponseWriter, r *http.Request) {
 func callVision(ctx context.Context, enc string) (*vision.BatchAnnotateImagesResponse, error) {
 	img := &vision.Image{Content: enc}
 
-	feature := &vision.Feature{
-		Type:       "LABEL_DETECTION",
-		MaxResults: 10,
-	}
 	req := &vision.AnnotateImageRequest{
-		Image:    img,
-		Features: []*vision.Feature{feature},
+		Image: img,
+		Features: []*vision.Feature{
+			&vision.Feature{
+				Type:       "TYPE_UNSPECIFIED",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "FACE_DETECTION",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "LANDMARK_DETECTION",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "LOGO_DETECTION",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "LABEL_DETECTION",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "TEXT_DETECTION",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "SAFE_SEARCH_DETECTION",
+				MaxResults: 100,
+			},
+			&vision.Feature{
+				Type:       "IMAGE_PROPERTIES",
+				MaxResults: 100,
+			}},
 	}
 	batch := &vision.BatchAnnotateImagesRequest{
 		Requests: []*vision.AnnotateImageRequest{req},
