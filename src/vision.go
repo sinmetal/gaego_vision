@@ -64,6 +64,9 @@ func handleVision(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%s vision api response json marshal error", imgurl), http.StatusBadRequest)
 		return
 	}
+
+	log.Infof(ctx, "{\"__IMG_URL__\":\"%s\",\"__VISION_RESPONSE__\":%s}", imgurl, body)
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write(body)
