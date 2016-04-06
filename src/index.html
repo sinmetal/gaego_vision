@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <meta charset="UTF-8">
+    <title>Vision API Demo</title>
+    <link rel="stylesheet" media="all" href="/css/json.human.css" />
+    <link rel="stylesheet" media="all" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.16.0/codemirror.css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.16.0/codemirror.min.js"></script>
+    <script src="/js/lib/json.human.js"></script>
+    <script src="/js/main.js"></script>
+</head>
+<body>
+    <div>
+        <form method="post">
+            <label for="imgurl">Image URL</label>
+            <input type="text" id="imgurl">
+            <input type="button" onclick="sample.submit()" value="Submit"/>
+        </form>
+    </div>
+    <div>
+        <img id="target" src="">
+    </div>
+    <div>
+        <div id="output"></div>
+    </div>
+</body>
+</html>
