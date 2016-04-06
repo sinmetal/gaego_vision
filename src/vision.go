@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"golang.org/x/net/context"
 
@@ -32,6 +33,16 @@ func handleVision(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var limit int
+	var err error
+	limitParam := r.FormValue("limit")
+	if limitParam != "" {
+		limit, err = strconv.Atoi(limitParam)
+		if err != nil {
+			http.Error(w, "limit is number", http.StatusBadRequest)
+		}
+	}
+
 	client := urlfetch.Client(ctx)
 	resp, err := client.Get(imgurl)
 	if err != nil {
@@ -52,7 +63,7 @@ func handleVision(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vresp, err := callVision(ctx, base64.StdEncoding.EncodeToString(blob))
+	vresp, err := callVision(ctx, base64.StdEncoding.EncodeToString(blob), int64(limit))
 	if err != nil {
 		log.Warningf(ctx, "%s call vision api error. err = %s", imgurl, err.Error())
 		http.Error(w, fmt.Sprintf("%s call vision api error", imgurl), http.StatusBadRequest)
@@ -72,7 +83,7 @@ func handleVision(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
-func callVision(ctx context.Context, enc string) (*vision.BatchAnnotateImagesResponse, error) {
+func callVision(ctx context.Context, enc string, limitParam int64) (*vision.BatchAnnotateImagesResponse, error) {
 	img := &vision.Image{Content: enc}
 
 	req := &vision.AnnotateImageRequest{
@@ -80,35 +91,35 @@ func callVision(ctx context.Context, enc string) (*vision.BatchAnnotateImagesRes
 		Features: []*vision.Feature{
 			&vision.Feature{
 				Type:       "TYPE_UNSPECIFIED",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "FACE_DETECTION",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "LANDMARK_DETECTION",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "LOGO_DETECTION",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "LABEL_DETECTION",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "TEXT_DETECTION",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "SAFE_SEARCH_DETECTION",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			},
 			&vision.Feature{
 				Type:       "IMAGE_PROPERTIES",
-				MaxResults: 100,
+				MaxResults: limitParam,
 			}},
 	}
 	batch := &vision.BatchAnnotateImagesRequest{
